@@ -26,6 +26,7 @@ namespace EM.Cloud.Services.Controllers
             string connectionString;
             connectionString = "SERVER=" + server + ";" + "DATABASE=" +
             database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";";
+            //port = 3306;
 
             connection = new MySqlConnection(connectionString);
         }
@@ -129,7 +130,52 @@ namespace EM.Cloud.Services.Controllers
         // GET api/email/5
         public string Get(int id)
         {
-            return "value";
+            try
+            {
+
+                string query = "SELECT * FROM Emails WHERE Id = 1";
+
+                //Create a list to store the result
+                List<string>[] list = new List<string>[3];
+                list[0] = new List<string>();
+                list[1] = new List<string>();
+                list[2] = new List<string>();
+
+                //Open connection
+                if (this.OpenConnection() == true)
+                {
+                    //Create Command
+                    MySqlCommand cmd = new MySqlCommand(query, connection);
+                    //Create a data reader and Execute the command
+                    MySqlDataReader dataReader = cmd.ExecuteReader();
+
+                    //Read the data and store them in the list
+                    while (dataReader.Read())
+                    {
+                        list[0].Add(dataReader["Id"] + "");
+                        list[1].Add(dataReader["WebsiteId"] + "");
+                        list[2].Add(dataReader["Email"] + "");
+                    }
+
+                    //close Data Reader
+                    dataReader.Close();
+
+                    //close Connection
+                    this.CloseConnection();
+
+                    //return list to be displayed
+                    return list[2].First();
+                }
+                else
+                {
+                    return "Connection not open";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return ex.ToString();
+            }
         }
 
         // POST api/email
